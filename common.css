@@ -1,0 +1,40 @@
+:root {
+    --bgcolor: #273752; 
+    --color1: #ededed;
+    --color2: #dcffc4;
+} 
+a {
+    color: rgb(203, 205, 235);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+body {
+    font-family: Futura, "Trebuchet MS", Arial, sans-serif;
+    background-color: var(--bgcolor);
+    color: var(--color1);
+    margin:5em;
+}
+h2 {
+    color: var(--color2);
+    font-size: 40px;
+}
+p {
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 24px;
+}
+footer {
+    font-size:12px;
+}
+embed {
+    font-size: 24px;
+    background-color: var(--color1);
+}
+pre {
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    font-size: 24px;
+    margin-bottom: 30px;
+}
