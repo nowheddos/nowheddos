@@ -1,0 +1,259 @@
+<html>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
+body {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size:30px;
+  font-weight:bold;
+}
+.stats {
+  font-size:27px;
+}
+.header {
+    font-family: 'Major Mono Display', monospace;
+  font-weight:normal;
+  text-transform: lowercase;
+  color:darkblue;
+  text-align: center;
+  line-height: 0;
+}
+h4 {
+  font-size:50px;
+}
+
+span {
+  font-family: 'Major Mono Display', monospace;
+} 
+.border {
+  width:500px;
+  height:40px;
+  border:4px solid black;
+  margin:5px;
+  background-color:lightgrey;
+  border-radius:7px;
+}
+.bar {
+  text-align:center;
+  line-height:40px;
+  background-color:green;
+  height:40px;
+  color:white;
+  font-size:22px;
+}
+  </style>
+  
+<div id="all">
+<div class="header">
+  <title>Time...</title>
+<h4 id="clock">00:00:00</h4>
+  
+<h5><span id="currentDate"></span></h5>
+</div><br>
+
+
+<body>
+  
+  <div id="school" hidden>
+It is period <span id="period"></span>.<br>
+    
+  <div id="inperiod" hidden>    
+<span id="pleft">x</span> left until period ends.<br>
+  </div>
+    <div id="break" hidden>
+  <span id="pnext">x</span> left until the next period starts.<br>  
+    </div>
+    
+    <div class="border" id="periodBar">
+      <div class="bar" style="width:00%">00%</div>
+    </div>
+<span id="dayleft">x</span> left until school day ends.<br>
+    <div class="border" id="dayBar">
+      <div class="bar" style="width:0%">0%</div>
+    </div>
+  </div>
+  
+  <div id="home" hidden>
+   The school day is currently over.<br>
+   <span id="nextday"></span> left until period 1.
+  </div>
+  
+  <div id="weekend" hidden>
+   It's the weekend. What are you doing here?<br>
+   <span id="wnextday"></span> left until period 1 on Monday.
+  </div>
+  
+  <hr>
+  
+  <div class="stats">
+    <span id="daysleft">x</span> days left until Summer.<br>
+    Year completion percentage:
+    <div class="border" id="summerBar">
+      <div class="bar" style="width:00%">00%</div>
+    </div>
+    
+    
+  </div>
+</body>
+  </div>
+  
+ <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js'>
+ <script>
+   var now = new Date;
+const year = parseInt(JSON.stringify(now).substring(1,5))
+//future proofing
+var time =  now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()
+//const testTime = new Date('10/4/2021 12:53:50 PM')
+//now = testTime
+var period;
+var inBetween = false;
+var mode = "class" // Modes: break, class, home, or weekend
+const day = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+const month = ["January","February","March","April","May","June","July","August","September","October","November","December"]
+const p = ["7:30","8:11","8:15","8:56","9:00","9:41","9:50","10:31","10:36","11:17","11:22","12:03","12:08","12:49","12:54","13:35","13:40","14:20"]
+const endDate = new Date('6/14/' + (year + 1) + ' 2:40 PM')
+const nextYear = new Date('9/6/' + (year + 1) + ' 6:00 AM')
+const schoolStart = new Date('9/6/' + year + ' 7:30 AM')
+// period times. 7:30 - 8:11 is first, 8:15 - 8:56 is second, etc.
+
+// i dont need it updating the date, month, etc every *second* so i do it here
+$('#currentDate')[0].innerHTML = day[now.getDay()] +
+  " " + month[now.getMonth()] +
+  " " + now.getDate() + " "
+
+function pad(n) {
+  return String(n).padStart(2, '0')
+}
+//adds a "0" in front of single numbers, so that it goes 08, 09, 10, 11, etc
+function con(t) {
+  //t.split(':')[0] = hours
+  //t.split(':')[1] = minutes
+if (typeof t !== 'undefined') {
+ return t.split(':')[0] * 3600 + t.split(':')[1] * 60
+  } else {
+    return 0
+  }
+}
+//convert mm:ss time into seconds
+function dec(t) {
+  if(t > 3600) {
+  return Math.floor(t / 3600) + ":" + pad(Math.floor(t % 3600 / 60)) + ":" + pad(t % 60)
+  } else {
+  return Math.floor(t / 60) + ":" + pad(t % 60)
+    }
+}
+//convert seconds time into mm:ss
+function progBar(id,per) {
+  $('#' + id).children()[0].style.width = per * 100 + "%"
+  $('#' + id).children()[0].innerHTML = Math.floor(per * 100) + "%"
+}
+//edits a progress bar
+if(now > endDate && now < nextYear) {
+  $('#all')[0].innerHTML = "What are you still doing here?"
+} else {
+
+$('#daysleft')[0].innerHTML = Math.floor((endDate - now) / 1000 / 60 / 60 / 24)
+progBar("summerBar", (now - schoolStart) / (endDate - schoolStart))
+// edits the x time until summer message & bar
+function refresh() {
+  now = new Date;
+    //seconds since midnight
+  time =  now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()
+  
+  if(now.getSeconds() === 0) {
+    minuteRefresh();
+  }
+  
+  //change time on main clock
+  if(now.getHours() === 12) {
+  $('#clock')[0].innerHTML = "12:" + pad(now.getMinutes()) + ":" + pad(now.getSeconds())    
+  } else {
+  $('#clock')[0].innerHTML = (now.getHours() % 12) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds())
+  }
+
+  //school day
+  if(mode === "class") {
+    
+    if(inBetween) {
+      $('#break')[0].removeAttribute('hidden')
+      $('#inperiod')[0].hidden = true;
+      timeLeft = con(p[period*2 + 2]) - time
+        // calculate how much time is left in break before period
+      
+          progBar("periodBar",(time - con(p[period*2+1])) /
+            (con(p[period*2 + 2])- con(p[period*2+1])));
+    } else {
+      $('#inperiod')[0].removeAttribute('hidden')
+      $('#break')[0].hidden = true;
+      timeLeft = con(p[period*2 + 1]) - time
+        // calculate how much time is left in period
+      
+      progBar("periodBar",(time - con(p[period*2])) /
+            (con(p[period*2 + 1])- con(p[period*2])))
+    }
+    
+    $('#period')[0].innerHTML = period + 1
+    //fcking javascript.. 
+    $('#pleft')[0].innerHTML = dec(timeLeft)
+    $('#pnext')[0].innerHTML = dec(timeLeft)
+      document.title = dec(timeLeft);
+    //chrome might not work with this title updator.. welp, may as well see if it works :P
+    $('#dayleft')[0].innerHTML = dec(con(p[17]) - time)
+    progBar("dayBar",(time - con(p[0])) / (con(p[17])- con(p[0])))
+  }
+  //after school
+  if(mode === "home") {
+    //morning before period 1
+    if(time < con(p[0])) {
+    $('#nextday')[0].innerHTML = dec(con(p[0]) - time)
+    //after period 9   
+    } else {
+    $('#nextday')[0].innerHTML = dec((86400 + con(p[0])) - time)
+    }  
+  }
+  
+}
+
+function minuteRefresh() {
+  
+  if(time < con(p[0]) || time > con(p[17])) {
+mode = "home"  
+  // if time is outside of school hours...
+} else {
+  //during school day
+  for(var i=0;i < p.length;i+=2) {
+  if(time > con(p[i]) && time < con(p[i+2]) || i === p.length) {
+    // if time is in this period...
+    period = i / 2;
+    if(time > con(p[i+1])) {
+    //check if it is currently a break
+    // break = the ~4 minutes between periods
+      inBetween = true;
+    } else {
+      inBetween = false;
+    }
+      mode = "class";
+    break;
+  }
+}
+  // calculate current period
+}
+  
+if(mode === "class") {
+    $('#school')[0].removeAttribute('hidden')
+    $('#home')[0].hidden = true;
+}
+if(mode === "home") {
+    $('#home')[0].removeAttribute('hidden');
+    $('#school')[0].hidden = true;
+  }
+}
+minuteRefresh();
+refresh();
+setInterval(refresh, 1000);
+//update every second
+ }
+  </script>
+  
+</html>
